@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1b1b2f;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 400px;
+            padding: 20px;
+            background-color: #2a2a40;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 0, 150, 0.3), 0 0 15px rgba(0, 200, 255, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff4081;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            margin: 10px 0;
+            padding: 12px;
+            background-color: #222;
+            border-radius: 8px;
+            border: 2px solid #ff4081;
+            color: #ffffff;
+            font-size: 1.2em;
+        }
+
+        #timer {
+            color: #00e6e6;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        #currentResult {
+            font-size: 1.2em;
+            color: #ff4081;
+        }
+
+        .history-list {
+            list-style-type: none;
+            padding: 0;
+            max-height: 120px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .history-item {
+            padding: 6px;
+            margin: 4px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid #ff4081;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TFOX 30SEC FUCK SERVER</h1>
+
+    <div class="box">
+        <div>Period Number</div>
+        <div id="periodNumber">Loading...</div>
+    </div>
+
+    <div class="box">
+        <div>Timer</div>
+        <div id="timer">00:30</div>
+    </div>
+
+    <div class="box">
+        <div>Current Result</div>
+        <div id="currentResult">Waiting...</div>
+    </div>
+
+    <div class="box">
+        <div>History</div>
+        <ul id="history" class="history-list"></ul>
+    </div>
+</div>
+
+<script>
+    const periodNumberElement = document.getElementById('periodNumber');
+    const timerElement = document.getElementById('timer');
+    const currentResultElement = document.getElementById('currentResult');
+    const historyElement = document.getElementById('history');
+
+    const results = [
+        'SMALL', 'BIG', 'SMALL', 'BIG', 'RED', 'RED', 'RED', 'SMALL', 'BIG', 'SMALL',
+        'GREEN', 'BIG', 'BIG', 'BIG', 'SMALL', 'BIG', 'SMALL', 'BIG', 'BIG', 'SMALL',
+        'BIG', 'GREEN', 'SMALL', 'BIG', 'RED', 'BIG', 'SMALL', 'BIG', 'GREEN', 'BIG',
+        'BIG', 'SMALL', 'SMALL', 'SMALL', 'SMALL', 'BIG', 'SMALL', 'BIG', 'SMALL', 'RED',
+        'RED', 'SMALL'
+    ];
+
+    let currentPeriodNumber = 0;
+    let currentResultIndex = -1;
+    let lastDisplayedPeriod = -1;
+
+    function updatePeriodAndResult() {
+        const now = new Date();
+        const utcYear = now.getUTCFullYear();
+        const utcMonth = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const utcDay = String(now.getUTCDate()).padStart(2, '0');
+        const utcHours = now.getUTCHours();
+        const utcMinutes = now.getUTCMinutes();
+        const utcSeconds = now.getUTCSeconds();
+
+        const totalMinutes = utcHours * 60 + utcMinutes;
+        const periodNumber = 1 + totalMinutes * 2 + (utcSeconds >= 30 ? 1 : 0);
+        const periodString = `${utcYear}${utcMonth}${utcDay}30${String(periodNumber).padStart(4, '0')}`;
+        
+        periodNumberElement.textContent = periodString;
+
+        if (periodNumber !== lastDisplayedPeriod && currentResultIndex < results.length - 1) {
+            currentResultIndex++;
+            const result = results[currentResultIndex];
+            currentResultElement.textContent = result;
+
+            const historyItem = document.createElement('li');
+            historyItem.textContent = `Period: ${periodString}, Result: ${result}`;
+            historyItem.className = 'history-item';
+            historyElement.prepend(historyItem);
+
+            lastDisplayedPeriod = periodNumber;
+        }
+    }
+
+    function startTimer() {
+        setInterval(() => {
+            const now = new Date();
+            const remainingSeconds = 30 - (now.getUTCSeconds() % 30);
+            const secondsDisplay = remainingSeconds.toString().padStart(2, '0');
+            timerElement.textContent = `00:${secondsDisplay}`;
+
+            if (remainingSeconds === 30) {
+                updatePeriodAndResult();
+            }
+        }, 1000);
+    }
+
+    window.onload = startTimer;
+</script>
+
+
+
+</body></html>
